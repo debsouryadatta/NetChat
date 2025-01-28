@@ -24,3 +24,10 @@
 17. Putting the redis instance into the rag-chat client so that it automatically saves the chats in the redis db according to the new sessionId.
 18. Getting the initialMessages from the rag-chat history by just simply passing the sessionId and the amount of messages to be fetched(All the hard stuff are done under the hood by the rag-chat).
 19. Also we can put Groq Api in the rag-chat client and use the other Open source models.
+
+
+### Revamp(Jan2025):
+1. Adding Clerk Auth to the project following this doc - https://clerk.com/docs/quickstarts/nextjs
+2. Setting up prisma postgres with neon.tech db
+3. Used the deployed crawl4ai api to get the site content
+3. `pnpm i llm-chunk` -> For chunking the content, `pnpm i @google/generative-ai` -> For vector embedding

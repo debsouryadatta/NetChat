@@ -1,13 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-export function middleware(req: NextRequest) {
-    const res = NextResponse.next();
+// Define which routes should be public
+const isPublicRoute = createRouteMatcher([
+  '/', 
+  '/onboarding',
+  '/api/webhook/clerk',
+  '/sign-in',
+  '/sign-up',
+  '/sso-callback',
+])
 
-    const cookie = req.cookies.get("sessionId");
+export default clerkMiddleware(async (auth, req) => {
+  const { userId, redirectToSignIn } = await auth()
+  
+  // If the user isn't signed in and the route isn't public, redirect to sign-in
+  if (!userId && !isPublicRoute(req)) {
+    return redirectToSignIn({ returnBackUrl: req.url })
+  }
 
-    if(!cookie){
-        res.cookies.set("sessionId", crypto.randomUUID());
-    }
+  // Allow the request to continue
+  return null
+})
 
-    return res;
+export const config = {
+  matcher: [
+    // Skip Next.js internals and all static files
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 }

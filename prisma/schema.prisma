@@ -1,0 +1,79 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model User {
+  id        String    @id
+  email     String    @unique
+  imageUrl  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  websites  Website[]
+  chats     Chat[]
+}
+
+model Website {
+  id                         String                    @id @default(cuid())
+  url                        String
+  content                    String
+  title                      String?
+  summary                    String?
+  createdAt                  DateTime                  @default(now())
+  updatedAt                  DateTime                  @updatedAt
+  lastScraped                DateTime?
+  user                       User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                     String
+  WebsiteContentEmbedding    WebsiteContentEmbedding[]
+  chats                      Chat[]
+
+  @@index([userId])
+}
+
+model WebsiteContentEmbedding {
+  id        String                      @id @default(cuid())
+  content   String                      @db.Text
+  embedding Unsupported("vector(768)")?
+  website   Website                     @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  websiteId String
+  createdAt DateTime                    @default(now())
+  updatedAt DateTime                    @updatedAt
+
+  @@index([websiteId])
+}
+
+model Chat {
+  id        String    @id @default(cuid())
+  website   Website   @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  websiteId String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([websiteId])
+  @@index([userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  role      Role     @default(USER)
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId    String
+  createdAt DateTime @default(now())
+
+  @@index([chatId])
+}
+
+enum Role {
+  USER
+  ASSISTANT
+}

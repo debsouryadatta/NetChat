@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/Providers";
+import { Navbar } from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(inter.className, "min-h-screen antialiased")}>
         <Providers>
-          <main className="h-screen dark text-foreground bg-background">{children}</main>
+          <main>
+            <Navbar />
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

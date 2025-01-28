@@ -1,8 +1,15 @@
 "use client";
 
 import { PropsWithChildren } from "react";
-import { NextUIProvider } from "@nextui-org/react";
+import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const Providers = ({ children }: PropsWithChildren) => {
-  return <NextUIProvider>{children}</NextUIProvider>;
+  return (
+    <ClerkProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        {children}
+      </ThemeProvider>
+    </ClerkProvider>
+  );
 };
